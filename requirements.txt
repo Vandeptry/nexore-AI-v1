@@ -1,0 +1,8 @@
+#requirements.txt
+fastapi
+uvicorn
+tensorflow
+opencv-python
+scikit-learn
+numpy
+python-multipart
