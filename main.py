@@ -5,6 +5,7 @@ import shutil
 import uuid
 import os
 from recognizer import recognize_face
+import traceback
 
 app = FastAPI()
 
@@ -15,14 +16,21 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/recognize")
 async def recognize(file: UploadFile = File(...)):
-    file_ext = file.filename.split('.')[-1]
-    temp_filename = f"{UPLOAD_DIR}/{uuid.uuid4().hex}.{file_ext}"
-    
-    with open(temp_filename, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    try:
+        file_ext = file.filename.split('.')[-1]
+        temp_filename = f"{UPLOAD_DIR}/{uuid.uuid4().hex}.{file_ext}"
 
-    result = recognize_face(temp_filename, db_path=DB_PATH)
+        with open(temp_filename, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
-    os.remove(temp_filename)
+        print(f"[INFO] File saved to: {temp_filename}")
 
-    return JSONResponse(content=result)
+        result = recognize_face(temp_filename, db_path=DB_PATH)
+
+        os.remove(temp_filename)
+        return JSONResponse(content=result)
+
+    except Exception as e:
+        print("[ERROR] Exception occurred!")
+        traceback.print_exc()  # 🧨 In stack trace đầy đủ
+        return JSONResponse(content={"error": str(e)}, status_code=500)
