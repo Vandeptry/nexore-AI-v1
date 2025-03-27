@@ -6,8 +6,17 @@ import uuid
 import os
 from recognizer import recognize_face
 import traceback
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploads"
 DB_PATH = "face_db.pkl"
